@@ -4,9 +4,9 @@ import type { MinionCard } from '../game/types';
 import { motion } from 'framer-motion';
 import './card-anim.css';
 
-interface CardFrameProps { id: string; playable?: boolean; pending?: boolean; marked?: boolean; selectable?: boolean; onClick?: () => void; handIndex?: number; }
+interface CardFrameProps { id: string; playable?: boolean; pending?: boolean; marked?: boolean; selectable?: boolean; onClick?: () => void; handIndex?: number; mulliganMode?: boolean; }
 
-export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, marked, selectable, onClick, handIndex }) => {
+export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, marked, selectable, onClick, handIndex, mulliganMode }) => {
   const c = CARDS[id];
   const isMinion = c.type === 'MINION';
   const costGradId = `cost-${id}-grad`;
@@ -77,12 +77,15 @@ export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, mar
     );
   };
   const interactive = playable || selectable;
+  const mulliganSelected = !!marked && !!mulliganMode; // stronger explicit flag
   return (
     <motion.div
       // Zastąpiono animacje whileHover / whileTap stabilnymi klasami CSS, aby uniknąć "skakania" przy szybkim najeżdżaniu
       onClick={onClick}
       // Removed mount animation to prevent flicker when hand re-renders
       initial={false}
+  aria-pressed={mulliganSelected || undefined}
+  data-mulligan-sel={mulliganSelected ? '1' : undefined}
   className={`relative w-[7.4rem] h-44 rounded-xl p-2 flex flex-col font-sans border-[1.5px] transition select-none text-white
   ${interactive ? 'cursor-pointer hover:brightness-105 active:brightness-95' : 'cursor-default opacity-70 grayscale brightness-75 saturate-50'}
   will-change-filter duration-150 ease-out
@@ -101,15 +104,19 @@ export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, mar
   )}
       {isMinion && (
         <div className="absolute bottom-1 right-1 flex items-end pointer-events-none">
-          <div className="scale-[0.68] origin-bottom-right drop-shadow-[0_2px_7px_rgba(0,0,0,0.55)]"><StatHex kind="ATK" value={(c as MinionCard).attack} /></div>
-          <div className="scale-[0.68] -ml-3 origin-bottom-right drop-shadow-[0_2px_7px_rgba(0,0,0,0.55)]"><StatHex kind="HP" value={(c as MinionCard).health} /></div>
+          <div className="scale-[0.85] origin-bottom-right drop-shadow-[0_2px_7px_rgba(0,0,0,0.55)]"><StatHex kind="ATK" value={(c as MinionCard).attack} /></div>
+          <div className="scale-[0.85] -ml-2 origin-bottom-right drop-shadow-[0_2px_7px_rgba(0,0,0,0.55)]"><StatHex kind="HP" value={(c as MinionCard).health} /></div>
         </div>
       )}
   {playable && c.type === 'MINION' && <div className="absolute -inset-[3px] rounded-xl ring-2 ring-emerald-300 animate-softPulseMinor pointer-events-none" />}
   {playable && c.type === 'SPELL' && !pending && <div className="absolute -inset-[3px] rounded-xl ring-2 ring-purple-300 animate-softPulseSpell pointer-events-none" />}
   {pending && <div className="absolute -inset-1 rounded-xl ring-4 ring-purple-300 shadow-[0_0_14px_#7e22ce] animate-targetPulse pointer-events-none" />}
-      {marked && !pending && (
-        <div className="absolute -inset-1 rounded-xl ring-2 ring-amber-300/70 bg-amber-300/5 animate-mulliganGlow pointer-events-none" />
+      {mulliganSelected && !pending && (
+        <>
+          <div className="absolute -inset-1 rounded-xl ring-2 ring-amber-300/70 bg-amber-300/10 animate-mulliganGlow pointer-events-none z-[5]" />
+          {/* Strong outer soft glow */}
+          <div className="absolute -inset-2 rounded-2xl pointer-events-none z-[4] opacity-75 mulligan-glow-outer" />
+        </>
       )}
     </motion.div>
   );
