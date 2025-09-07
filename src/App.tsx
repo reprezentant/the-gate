@@ -4,6 +4,7 @@ import { CARDS } from './game/cards';
 import { initGame, playCardForSidePure, startTurnFor, heroPowerAction, BOARD_LIMIT, HAND_LIMIT, HERO_POWER_COST, HERO_POWER_DAMAGE, processDeaths, applyWinner, clone, performMulligan, onDraw, computePotentialLethal, canAttackTargetRespectingTaunt } from './game/engine';
 // Removed unused legacy non-animated AI import
 import { Hero } from './components/Hero';
+import { LoaderOverlay } from './components/LoaderOverlay';
 import { BoardRow } from './components/BoardRow';
 import { Hand as HandComp } from './components/Hand';
 import { LogPanel } from './components/LogPanel';
@@ -123,6 +124,29 @@ function HeroPowerFloating({ activeTurn, used, mana, cost, onUse }: { activeTurn
 // =========================================================
 
 export default function CardGameMVP() {
+  const [bootProgress, setBootProgress] = useState(0);
+  const [bootDone, setBootDone] = useState(false);
+  // Simulated boot loading (assets / warming). Replace with real preloads if available later.
+  useEffect(()=> {
+    if (bootDone) return;
+    let mounted = true;
+    const start = performance.now();
+    function tick(now:number){
+      if (!mounted) return;      
+      const elapsed = now - start; // ms
+      // Ease-out progress curve (cap 100) ~1.6s
+      const pct = Math.min(100, (elapsed/16)); // ~1600ms to 100
+      // Add slight smoothing
+      setBootProgress(p => p < pct ? pct : p);
+      if (pct >= 100) {
+        setTimeout(()=> mounted && setBootDone(true), 250); // short dwell
+        return;
+      }
+      requestAnimationFrame(tick);
+    }
+    const r = requestAnimationFrame(tick);
+    return ()=> { mounted=false; cancelAnimationFrame(r); };
+  }, [bootDone]);
   const [gs, setGs] = useState<GameState>(() => initGame());
   const [attackerId, setAttackerId] = useState<string | null>(null);
   const [pendingSpell, setPendingSpell] = useState<number | null>(null); // index zaklęcia czekającego na cel
@@ -647,6 +671,7 @@ export default function CardGameMVP() {
 
   return (
     <div className="arena-scale-wrapper" onMouseMove={(e)=> setPointer({x:e.clientX,y:e.clientY})}>
+      <LoaderOverlay done={bootDone} progress={bootProgress} />
       <div style={arenaScaleStyle} className="arena-scale-inner">
   <div ref={arenaRef} className="relative w-full aspect-[16/9] rounded-[2.75rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.6)] overflow-visible border border-white/15 backdrop-blur-sm bg-white/2 before:content-[''] before:absolute before:inset-0 before:rounded-[2.75rem] before:pointer-events-none before:border before:border-white/5 before:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06),0_0_0_1px_rgba(255,255,255,0.04)] after:content-[''] after:absolute after:inset-0 after:rounded-[2.75rem] after:pointer-events-none after:bg-gradient-to-br after:from-white/6 after:via-transparent after:to-white/2">
   {/* Background layer with parallax (rounded clipping) */}
