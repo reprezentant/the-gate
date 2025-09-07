@@ -1,0 +1,71 @@
+/* Wachlarzowy układ ręki gracza */
+/* Viewport – tylko górne ~35% kart początkowo widoczne */
+/* Viewport: pokazuje tylko górną część kart, ale pozwala karcie wyjechać DO GÓRY (overflow:visible) */
+.hand-fan-viewport {
+  position: relative;
+  width: 100%;
+  height: 4.0rem; /* podniesiony wachlarz (mniej ukryte) */
+  overflow: visible;
+  user-select: none;
+  pointer-events: auto;
+  z-index: 70; /* wyżej ponad inne UI aby hover nie był obcinany przez nakładki */
+}
+
+/* Właściwy wachlarz przesunięty w dół, żeby karty były przycięte */
+.hand-fan-wrapper {
+  position: absolute;
+  left: 50%;
+  bottom: -9.7rem; /* podniesiony wachlarz */
+  transform: translateX(-50%);
+  width: 100%;
+  height: 16.5rem;
+  display: block;
+  pointer-events: none; /* domyślnie wyłączone – włączamy osobną klasą interakcyjną */
+}
+
+.hand-fan-wrapper-interactive { pointer-events: auto; }
+
+/* (opcjonalny hook na przyszłość usunięty – można dodać klasę kiedyś) */
+.hand-fan-slot {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transition: transform 420ms cubic-bezier(.25,.9,.32,1.08), z-index 80ms linear, opacity 260ms ease;
+  transform-origin: 50% 90%;
+  pointer-events: auto;
+  will-change: transform;
+}
+/* Pseudo-element powiększa obszar hover w górę (wysokość wynurzenia) aby nie zrywać hover przy podnoszeniu */
+.hand-fan-slot::before {
+  content: '';
+  position: absolute;
+  left: -14px; right: -14px; /* szerszy obszar aby nie przeskakiwać między kartami */
+  top: -60px; /* większy zasięg – karta podnosi się do ~28px + bufor */
+  height: 60px;
+  pointer-events: auto;
+  cursor: inherit;
+}
+
+/* Wewnętrzny wrapper wynurzenia – stabilizuje bazowy łuk i animuje tylko podniesienie */
+.hand-fan-cardLift {
+  transition: transform 560ms cubic-bezier(.18,.72,.15,1), filter 480ms ease, opacity 260ms ease;
+  transform-origin: 50% 90%;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  contain: layout style paint;
+  position: relative;
+  z-index: 0;
+}
+.hand-fan-cardLift.is-lifted {
+  transform: translateY(-26px) scale(1.04) translateZ(0); /* wyraźniejsze uniesienie */
+  filter: drop-shadow(0 12px 20px rgba(0,0,0,0.5));
+  z-index: 5; /* nad sąsiadami */
+}
+/* Fallback: jeśli z jakiegoś powodu stan hovered nie zadziała, klasyczny :hover na slocie nadal podnosi kartę minimalnie */
+.hand-fan-slot:hover > .hand-fan-cardLift:not(.is-lifted) {
+  transform: translateY(-20px) scale(1.02) translateZ(0);
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.45));
+}
+/* Delikatne spowolnienie przy opuszczaniu – poprzez custom timing można dodać w przyszłości */
+/* Hover efekt zarządzany teraz w JS (sąsiedzi się rozsuwają) */
+/* Gdy karta jest pending (celowana) – możemy dodać w przyszłości inny efekt */

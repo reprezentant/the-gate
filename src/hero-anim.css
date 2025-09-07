@@ -1,0 +1,25 @@
+/* Hero damage flash */
+@keyframes hero-damage-flash { 0% { filter: brightness(1); transform: scale(1); } 35% { filter: brightness(1.5) saturate(1.3); transform: scale(1.08); } 70% { filter: brightness(0.9); } 100% { filter: brightness(1); transform: scale(1); } }
+.animate-hero-damage { animation: hero-damage-flash 260ms ease-out; }
+@keyframes hero-big-damage { 0% { filter: brightness(1) saturate(1); transform: scale(1); } 20% { filter: brightness(1.6) saturate(1.4); transform: scale(1.14) rotate(-1deg); } 45% { filter: brightness(1.2); transform: scale(1.07) rotate(1deg);} 70% { filter: brightness(0.95); } 100% { filter: brightness(1); transform: scale(1); } }
+.animate-hero-big-damage { animation: hero-big-damage 420ms cubic-bezier(.34,1.56,.64,1); }
+
+/* Blood pop */
+@keyframes blood-pop { 0% { opacity:0; transform: scale(0.4) translateY(6px); } 30% { opacity:1; transform: scale(1) translateY(-4px); } 70% { opacity:0.85; } 100% { opacity:0; transform: scale(0.6) translateY(-18px); } }
+.animate-blood-pop { animation: blood-pop 1s ease-out forwards; }
+
+/* Subtle shake (translation only so it can combine with outer scale) */
+@keyframes hero-shake { 
+	0%,100% { transform: translate(0,0); }
+	20% { transform: translate(-2px,1px); }
+	40% { transform: translate(2px,-1px); }
+	60% { transform: translate(-2px,-1px); }
+	80% { transform: translate(1px,2px); }
+}
+.animate-hero-shake { animation: hero-shake 260ms ease-in-out; }
+@keyframes hero-big-shake { 0%,100% { transform: translate(0,0); } 15% { transform: translate(-4px,2px); } 30% { transform: translate(4px,-3px); } 45% { transform: translate(-5px,-2px); } 60% { transform: translate(3px,4px); } 75% { transform: translate(-3px,1px); } }
+.animate-hero-big-shake { animation: hero-big-shake 420ms ease-in-out; }
+
+/* Shockwave ring for big hit */
+@keyframes hero-shockwave { 0% { opacity:0.55; transform: scale(1); } 60% { opacity:0.25; } 100% { opacity:0; transform: scale(1.8); } }
+.hero-shockwave::after { content:''; position:absolute; inset:0; border:4px solid rgba(255,50,50,0.5); border-radius:9999px; animation: hero-shockwave 520ms ease-out forwards; box-shadow:0 0 18px 4px rgba(255,60,60,0.35), 0 0 40px 12px rgba(255,0,0,0.15) inset; }
