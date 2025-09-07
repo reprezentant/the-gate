@@ -17,7 +17,7 @@ export const Minion: React.FC<MinionProps> = ({ m, highlighted, dimmed, isAttack
   const gradId = `${isAtk?'atk':'hp'}-grad`;
   // removed stroke gradient id (frames stripped)
   return (
-      <div className="relative w-10 h-10 select-none pointer-events-none" aria-label={isAtk ? 'Atak' : 'Zdrowie'}>
+  <div className="relative w-11 h-11 select-none pointer-events-none" aria-label={isAtk ? 'Atak' : 'Zdrowie'}>
         <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
           <defs>
             <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
@@ -43,8 +43,8 @@ export const Minion: React.FC<MinionProps> = ({ m, highlighted, dimmed, isAttack
             </filter>
           </defs>
       <polygon points="50,5 90,27 90,73 50,95 10,73 10,27" fill={`url(#${gradId})`} opacity="0.93" filter={`url(#${gradId}-sh)`} />
-          <text x="50" y="59" textAnchor="middle" fontSize="46" fontWeight="800" fill="#fff" stroke="#000" strokeWidth="6" paintOrder="stroke" fontFamily="inherit" style={{filter:'drop-shadow(0 2px 2px rgba(0,0,0,0.55))'}}>{value}</text>
-          <text x="50" y="59" textAnchor="middle" fontSize="46" fontWeight="800" fill="#fff" fontFamily="inherit">{value}</text>
+          <text x="50" y="59" textAnchor="middle" fontSize="50" fontWeight="800" fill="#fff" stroke="#000" strokeWidth="6" paintOrder="stroke" fontFamily="inherit" style={{filter:'drop-shadow(0 2px 2px rgba(0,0,0,0.55))'}}>{value}</text>
+          <text x="50" y="59" textAnchor="middle" fontSize="50" fontWeight="800" fill="#fff" fontFamily="inherit">{value}</text>
         </svg>
         {/* Optional small icon badge */}
         <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center text-[11px] font-bold text-white shadow" style={{backdropFilter:'blur(2px)'}}>
@@ -72,8 +72,8 @@ export const Minion: React.FC<MinionProps> = ({ m, highlighted, dimmed, isAttack
   <div className="mt-1 text-[16px] font-extrabold leading-tight text-center px-1 tracking-wide">{getDisplayName(c.id, m.owner)}</div>
       {/* Bottom-right compact hex stat icons */}
       <div className="absolute bottom-1 right-1 flex items-end pointer-events-none">
-        <div className="scale-[0.74] origin-bottom-right drop-shadow-[0_2px_7px_rgba(0,0,0,0.55)]"><StatHex kind="ATK" value={m.baseAttack} /></div>
-        <div className="scale-[0.74] -ml-3 origin-bottom-right drop-shadow-[0_2px_7px_rgba(0,0,0,0.55)]"><StatHex kind="HP" value={m.currentHealth} /></div>
+        <div className="origin-bottom-right drop-shadow-[0_2px_7px_rgba(0,0,0,0.55)]"><StatHex kind="ATK" value={m.baseAttack} /></div>
+        <div className="-ml-4 origin-bottom-right drop-shadow-[0_2px_7px_rgba(0,0,0,0.55)]"><StatHex kind="HP" value={m.currentHealth} /></div>
       </div>
       {/* Unified keyword row bottom overlay */}
       {keywords.length > 0 && (
