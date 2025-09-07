@@ -30,8 +30,8 @@ export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, mar
           </filter>
         </defs>
         <polygon points="50,0 93,25 93,75 50,100 7,75 7,25" fill={`url(#${costGradId})`} opacity="0.95" />
-        <polygon points="50,0 93,25 93,75 50,100 7,75 7,25" fill="none" stroke={`url(#${costStrokeId})`} strokeWidth="9" strokeLinejoin="round" filter={`url(#${costGradId}-sh)`} />
-        <polygon points="50,4 88,27 88,73 50,96 12,73 12,27" fill="none" stroke="#bfe7ff" strokeWidth="2.2" strokeLinejoin="round" opacity="0.45" />
+  <polygon points="50,0 93,25 93,75 50,100 7,75 7,25" fill="none" stroke={`url(#${costStrokeId})`} strokeWidth="7" strokeLinejoin="round" filter={`url(#${costGradId}-sh)`} />
+  <polygon points="50,4 88,27 88,73 50,96 12,73 12,27" fill="none" stroke="#bfe7ff" strokeWidth="1.8" strokeLinejoin="round" opacity="0.42" />
         <text x="50" y="60" textAnchor="middle" fontSize="54" fontWeight="800" fill="#fff" stroke="#000" strokeWidth="6" paintOrder="stroke" fontFamily="inherit">{value}</text>
         <text x="50" y="60" textAnchor="middle" fontSize="54" fontWeight="800" fill="#fff" fontFamily="inherit">{value}</text>
       </svg>
@@ -83,7 +83,7 @@ export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, mar
       onClick={onClick}
       // Removed mount animation to prevent flicker when hand re-renders
       initial={false}
-  className={`relative w-[7.4rem] h-44 rounded-xl p-2 flex flex-col font-sans border-2 transition select-none text-white
+  className={`relative w-[7.4rem] h-44 rounded-xl p-2 flex flex-col font-sans border-[1.5px] transition select-none text-white
   ${interactive ? 'cursor-pointer hover:brightness-105 active:brightness-95' : 'cursor-default opacity-70 grayscale brightness-75 saturate-50'}
   will-change-filter duration-150 ease-out
   ${c.type === 'MINION' ? 'bg-gradient-to-b from-emerald-700 to-emerald-600 border-emerald-300/70' : 'bg-gradient-to-b from-purple-800 to-purple-700 border-purple-300/70'} shadow-sm`}
@@ -109,7 +109,7 @@ export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, mar
   {playable && c.type === 'SPELL' && !pending && <div className="absolute -inset-[3px] rounded-xl ring-2 ring-purple-300 animate-softPulseSpell pointer-events-none" />}
   {pending && <div className="absolute -inset-1 rounded-xl ring-4 ring-purple-300 shadow-[0_0_14px_#7e22ce] animate-targetPulse pointer-events-none" />}
       {marked && !pending && (
-        <div className="absolute -inset-1 rounded-xl ring-4 ring-amber-300 shadow-[0_0_18px_6px_#fbbf24aa] animate-strongSelect pointer-events-none" />
+        <div className="absolute -inset-1 rounded-xl ring-2 ring-amber-300/70 bg-amber-300/5 animate-mulliganGlow pointer-events-none" />
       )}
     </motion.div>
   );
