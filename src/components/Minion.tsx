@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CARDS } from '../game/cards';
+import { CARDS, getDisplayName } from '../game/cards';
 import type { MinionInstance, MinionCard } from '../game/types';
 
 interface MinionProps { m: MinionInstance; highlighted?: boolean; dimmed?: boolean; isAttacker?: boolean; onClick?: () => void; }
@@ -69,7 +69,7 @@ export const Minion: React.FC<MinionProps> = ({ m, highlighted, dimmed, isAttack
   ${(CARDS[m.cardId] as MinionCard).rush && m.justSummoned && m.canAttack ? 'before:content-["" ] before:absolute before:-inset-2 before:rounded-xl before:bg-emerald-400/25 before:blur-xl before:animate-pulse' : ''}
   `}
     >
-  <div className="mt-1 text-[16px] font-extrabold leading-tight text-center px-1 tracking-wide">{c.name}</div>
+  <div className="mt-1 text-[16px] font-extrabold leading-tight text-center px-1 tracking-wide">{getDisplayName(c.id, m.owner)}</div>
       {/* Bottom-right compact hex stat icons */}
       <div className="absolute bottom-1 right-1 flex items-end pointer-events-none">
         <div className="scale-[0.74] origin-bottom-right drop-shadow-[0_2px_7px_rgba(0,0,0,0.55)]"><StatHex kind="ATK" value={m.baseAttack} /></div>

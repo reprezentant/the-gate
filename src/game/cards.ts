@@ -1,4 +1,5 @@
 import type { Card } from './types';
+import type { Side } from './types';
 
 export const CARDS: Record<string, Card> = {
   c_minion_young_warrior: { id: 'c_minion_young_warrior', name: 'Młody Wojownik', type: 'MINION', manaCost: 1, attack: 1, health: 2, text: 'Prosty wojownik.' },
@@ -13,6 +14,25 @@ export const CARDS: Record<string, Card> = {
   c_spell_fireball: { id: 'c_spell_fireball', name: 'Kula Ognia', type: 'SPELL', manaCost: 2, effects: [{ type: 'DAMAGE', amount: 3, target: 'ANY', text: 'Zadaj 3 dmg dowolnemu celowi.' }], text: 'Zadaj 3 obrażenia dowolnemu celowi.' },
   c_spell_arcane_bolt: { id: 'c_spell_arcane_bolt', name: 'Arkaniczny Piorun', type: 'SPELL', manaCost: 1, effects: [{ type: 'DAMAGE', amount: 2, target: 'ANY', text: '2 dmg dowolny cel.' }], text: 'Zadaj 2 obrażenia.' }
 };
+
+// Nazwy alternatywne wyłącznie dla strony AI (fantazyjna wariacja smoków)
+const AI_NAME_OVERRIDES: Record<string,string> = {
+  c_minion_young_warrior: 'Młody Smok',
+  c_minion_stone_defender: 'Kamienny Smok',
+  c_minion_berserker: 'Smok Berserker',
+  c_minion_guardian: 'Strażnik Smoków',
+  c_minion_colossus: 'Opasłe Smoczysko',
+  c_minion_shield_bearer: 'Gruboskórny',
+  c_spell_fireball: 'Ognisty Podmuch',
+  c_spell_arcane_bolt: 'Ognisty Grom'
+};
+
+// Zwraca nazwę karty zależną od strony (PLAYER zachowuje oryginał)
+export function getDisplayName(cardId: string, side: Side): string {
+  const base = CARDS[cardId]?.name || cardId;
+  if (side === 'AI' && AI_NAME_OVERRIDES[cardId]) return AI_NAME_OVERRIDES[cardId];
+  return base;
+}
 
 export const BASE_DECK: string[] = [
   'c_minion_young_warrior','c_minion_young_warrior',
