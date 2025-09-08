@@ -115,7 +115,7 @@ export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, mar
         <>
           <div className="absolute -inset-1 rounded-xl ring-2 ring-amber-300/70 bg-amber-300/10 animate-mulliganGlow pointer-events-none z-[5]" />
           {/* Strong outer soft glow */}
-          <div className="absolute -inset-2 rounded-2xl pointer-events-none z-[4] opacity-75 mulligan-glow-outer" />
+          <div className="absolute -inset-2 rounded-xl pointer-events-none z-[4] opacity-75 mulligan-glow-outer" />
         </>
       )}
     </motion.div>
