@@ -5,6 +5,10 @@ Prototyp gry karcianej "The Gate" (inspirowana Hearthstone) w React + TypeScript
 ## Cel
 Szybki MVP z podstawową pętlą gry: dobieranie, zagrywanie stronników / czarów, ataki, prosta AI z animacjami.
 
+## Contributing / Rules
+
+Please see `RULES.md` for small repository rules and contribution guidelines (branching, PRs, commits, tests, and code style).
+
 ## Stos technologiczny
 - React 19 + TypeScript
 - Vite 7
