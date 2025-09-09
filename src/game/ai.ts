@@ -95,32 +95,37 @@ export function simulateAiTurnOnce(gs: GameState): GameState {
   const attackPool = playerTaunts.length ? playerTaunts : next.player.board;
   const favorable = attackPool.find(pm => pm.currentHealth <= m.baseAttack && (CARDS[pm.cardId] as MinionCard).attack < m.currentHealth);
     if (favorable) {
-      favorable.currentHealth -= m.baseAttack;
-      m.currentHealth -= (CARDS[favorable.cardId] as MinionCard).attack;
+      // Shield handling in simulation
+      if (favorable.shield) { favorable.shield = false; next.log.push(`${favorable.owner}: tarcza ${favorable.cardId} (symulacja)`); }
+      else { favorable.currentHealth -= m.baseAttack; }
+      if (m.shield) { m.shield = false; next.log.push(`${m.owner}: tarcza ${m.cardId} (symulacja)`); }
+      else { m.currentHealth -= (CARDS[favorable.cardId] as MinionCard).attack; }
       next.log.push(`AI: trade z ${CARDS[favorable.cardId].name}`);
       if (favorable.currentHealth <= 0) next.player.board = next.player.board.filter(x => x.entityId !== favorable.entityId);
-  processDeaths(next);
-  if (m.currentHealth > 0) m.canAttack = false;
+      processDeaths(next);
+      if (m.currentHealth > 0) m.canAttack = false;
       continue;
     }
   const anyKill = attackPool.find(pm => pm.currentHealth <= m.baseAttack);
     if (anyKill) {
-      anyKill.currentHealth -= m.baseAttack;
-      m.currentHealth -= (CARDS[anyKill.cardId] as MinionCard).attack;
+      if (anyKill.shield) { anyKill.shield = false; next.log.push(`${anyKill.owner}: tarcza ${anyKill.cardId} (symulacja)`); }
+      else { anyKill.currentHealth -= m.baseAttack; }
+      if (m.shield) { m.shield = false; next.log.push(`${m.owner}: tarcza ${m.cardId} (symulacja)`); }
+      else { m.currentHealth -= (CARDS[anyKill.cardId] as MinionCard).attack; }
       next.log.push(`AI: poświęca się na ${CARDS[anyKill.cardId].name}`);
       if (anyKill.currentHealth <= 0) next.player.board = next.player.board.filter(x => x.entityId !== anyKill.entityId);
-  processDeaths(next);
-  if (m.currentHealth > 0) m.canAttack = false;
+      processDeaths(next);
+      if (m.currentHealth > 0) m.canAttack = false;
       continue;
     }
   // Taunt rule: cannot go face if player has any taunt minions
   if (playerTaunts.length) { continue; }
   // Rush restriction: freshly summoned rush minion cannot hit hero
   if (m.justSummoned && mCard.rush) { continue; }
-    next.player.heroHp -= m.baseAttack;
-    next.player.heroHp -= m.baseAttack;
-    next.log.push(`AI: atakuje bohatera za ${m.baseAttack}`);
-    m.canAttack = false;
+  // Hero attack: if attacking hero, shield doesn't apply (shields are minion-only)
+  next.player.heroHp -= m.baseAttack;
+  next.log.push(`AI: atakuje bohatera za ${m.baseAttack}`);
+  m.canAttack = false;
   }
   processDeaths(next);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+// import React not required with new JSX transform
 import type { Side, MinionCard, MinionInstance } from '../game/types';
 import { CARDS } from '../game/cards';
 import { Minion } from './Minion';

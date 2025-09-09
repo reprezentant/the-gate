@@ -25,6 +25,7 @@ export interface MinionCard extends BaseCard {
   health: number;
   effects?: Effect[];
   taunt?: boolean; // Prowokacja – musi zostać zaatakowany zanim bohater / inne bez Taunt
+  shield?: boolean; // Divine Shield – blocks first source of damage
   deathrattle?: Effect[]; // Efekty wykonywane po śmierci
   rush?: boolean; // Rush – może atakować w turze zagrania, ale tylko wrogich stronników
 }
@@ -44,6 +45,7 @@ export interface MinionInstance {
   currentHealth: number;
   canAttack: boolean;
   justSummoned?: boolean;
+  shield?: boolean;
 }
 
 export interface PlayerState {

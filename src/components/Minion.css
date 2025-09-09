@@ -1,0 +1,47 @@
+.minion-stats {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0; /* compact container; badges are absolutely positioned */
+  pointer-events: none;
+}
+
+.minion-attack, .minion-health {
+  width: 36px; /* slightly larger */
+  height: 36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  font-size:15px; /* larger digit */
+  color: white;
+  position: absolute;
+  bottom: -10px; /* overlap the bottom edge */
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.minion-attack {
+  left: -10px; /* adjusted for smaller badge */
+  background: none;
+  padding: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.minion-attack-icon { position: absolute; width: 36px; height: 36px; object-fit: contain; z-index: 10 }
+.minion-attack-value { position: relative; z-index: 20; font-weight:900; font-size:20px; color: white; -webkit-text-stroke:1px rgba(0,0,0,0.95); transform: translateY(-3px); }
+
+.minion-health {
+  right: -6px; /* adjusted */
+  background: none; /* use svg icon */
+  padding: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.minion-health-icon { position: absolute; width: 36px; height: 36px; object-fit: contain; z-index: 10 }
+.minion-health-value { position: relative; z-index: 20; font-weight:900; font-size:20px; color: white; -webkit-text-stroke:1px rgba(0,0,0,0.95); transform: translateY(-3px); }

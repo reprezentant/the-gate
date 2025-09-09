@@ -35,12 +35,19 @@
   50% { transform:scale(1); opacity:1; box-shadow:0 0 16px 4px #fbbf24cc; }
   100% { transform:scale(.94); opacity:.55; box-shadow:0 0 8px 0 #fbbf2488; }
 }
-.animate-mulliganGlow { animation:mulliganGlow 2.4s ease-in-out infinite; will-change:transform,opacity,box-shadow; }
+.animate-mulliganGlow { will-change: transform, opacity, box-shadow; }
 
-/* Stronger mulligan selected state (outer diffuse glow + slight scale on root) */
-[data-mulligan-sel='1'] { transform:translateZ(0) scale(1.025); box-shadow:0 0 0 1px rgba(255,200,80,0.35),0 4px 14px -2px rgba(0,0,0,0.6),0 0 22px 4px rgba(255,190,60,0.35); }
-[data-mulligan-sel='1']:hover { scale:1.035; }
-.mulligan-glow-outer { background:radial-gradient(circle at 50% 55%, rgba(255,193,70,0.55), rgba(255,193,70,0.15) 35%, transparent 70%); filter:blur(14px); mix-blend-mode:screen; }
+/* Mulligan selected state: non-layout ring (avoid changing box size) */
+[data-mulligan-sel='1'] {
+  /* outer ring without affecting layout; configurable via --mulligan-ring */
+  --mulligan-ring: 3px; /* default, tuneable */
+  --mulligan-ring-color: rgba(251,191,36,0.95);
+  box-shadow: 0 0 0 var(--mulligan-ring) var(--mulligan-ring-color); /* visual ring */
+  transform: none;
+  /* ensure no additional glow animation when explicitly selected */
+  will-change: auto;
+}
+.mulligan-glow-outer { display:none; }
 
 @media (prefers-reduced-motion:reduce) {
   [data-mulligan-sel='1'] { transition:none; }
@@ -53,3 +60,6 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-mulliganGlow,.animate-strongSelect { animation-duration:6s; }
 }
+
+/* Small tweaks: soften mulligan global glow via variable */
+:root { --mulligan-glow-blur: 12px; --mulligan-glow-color: #fbbf2488; }

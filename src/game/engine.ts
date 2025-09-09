@@ -154,6 +154,7 @@ export function playCardForSidePure(gs: GameState, side: Side, handIndex: number
       owner: side,
   baseAttack: (card as MinionCard).attack,
   currentHealth: (card as MinionCard).health,
+  shield: (card as MinionCard).shield ? true : false,
   canAttack: (card as MinionCard).rush ? true : false,
   justSummoned: true
     });
@@ -190,7 +191,11 @@ function applyEffectOnSide(gs: GameState, side: Side, eff: { type: string; amoun
         gs.log.push(`${side}: Deathrattle ${source} -> ${dmg} dmg w bohatera ${opponent}`);
       } else if (eff.target === 'ALL_ENEMY_MINIONS') {
         const enemyBoard = opponent === 'AI' ? gs.ai.board : gs.player.board;
-        enemyBoard.forEach(m => { m.currentHealth -= dmg; });
+        enemyBoard.forEach(m => {
+          // Divine Shield / shield mechanics: consume shield before applying health change
+          if (m.shield) { m.shield = false; gs.log.push(`${opponent}: tarcza ${m.cardId} została zużyta (${source})`); }
+          else { m.currentHealth -= dmg; }
+        });
         gs.log.push(`${side}: Deathrattle ${source} -> ${dmg} aoe wrogie stwory`);
       }
       break;

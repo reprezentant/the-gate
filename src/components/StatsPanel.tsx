@@ -1,4 +1,4 @@
-import React from 'react';
+// import React not required with new JSX transform
 
 interface StatsPanelProps {
   log: string[];
