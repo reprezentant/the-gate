@@ -60,6 +60,11 @@ Please see `RULES.md` for small repository rules and contribution guidelines (br
 - End Turn – mniejszy przycisk, ale wyraźniejsza typografia (dwulinijkowy KONIEC / TURY) i puls jeśli tura gracza.
 - Nowe panele HP / Mana / Deck / Hand: zunifikowany wielokąt (decagon) z animowaną cieczą i mini wskaźnikami talii/ręki.
 
+### Recent local UI/name edits
+- AI now uses separate names and separate `src/assets/cards/ai` images (player uses `human`).
+- Played-card artwork scaled and positioned for better readability; AI minions slightly nudged down.
+- Avatars changed to decagon (10-sided) shape; hero labels and meter labels adjusted and widened to avoid clipping.
+
 ## Architektura w skrócie
 Warstwa logiki gry pozostaje czysta (bez zależności od DOM) – reakcje UI są tylko efektem danych. Najważniejsze komponenty:
 

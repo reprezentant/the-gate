@@ -69,3 +69,7 @@ Small, practical guidance
 - For experiments, create an `experiment/*` branch and keep it separate from `main`.
 
 Thank you for contributing!
+
+Recent local edits
+-----------------
+- UI and naming updates were made locally: AI now has separate names and image assets; played-card artwork and layout were adjusted; avatars changed to a decagon shape; small HUD/label position tweaks applied. Please include screenshots when opening PRs that touch these visual areas.
