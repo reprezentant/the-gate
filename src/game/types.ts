@@ -26,6 +26,7 @@ export interface MinionCard extends BaseCard {
   effects?: Effect[];
   taunt?: boolean; // Prowokacja – musi zostać zaatakowany zanim bohater / inne bez Taunt
   shield?: boolean; // Divine Shield – blocks first source of damage
+  poisonous?: boolean; // Poisonous – kills any minion damaged by this minion (if damage > 0) unless shielded
   deathrattle?: Effect[]; // Efekty wykonywane po śmierci
   rush?: boolean; // Rush – może atakować w turze zagrania, ale tylko wrogich stronników
 }

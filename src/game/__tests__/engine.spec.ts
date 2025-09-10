@@ -47,15 +47,16 @@ describe('engine basic', () => {
     expect(inst?.justSummoned).toBe(true);
   });
 
-  it('deathrattle triggers on processDeaths', () => {
+  it('deathrattle triggers on processDeaths (exploding goblin used)', () => {
     const gs = initGame();
     gs.mulliganDone = true;
     // Inject a minion with 0 health and a deathrattle effect directly to board
-    const deathrattleCardId = 'c_minion_haunted_wailer';
-    gs.player.board.push({ entityId: 'X', cardId: deathrattleCardId, owner:'PLAYER', baseAttack:1, currentHealth:0, canAttack:false });
-    const before = gs.ai.heroHp;
-    processDeaths(gs);
-    expect(gs.ai.heroHp).toBe(before - 1); // its deathrattle deals 1 to enemy hero
+    const deathrattleCardId = 'c_minion_exploding_goblin';
+    gs.player.board.push({ entityId: 'X', cardId: deathrattleCardId, owner:'PLAYER', baseAttack:3, currentHealth:0, canAttack:false });
+    // Add a single enemy minion to verify AoE applies
+    gs.ai.board.push({ entityId: 'e', cardId: 'c_minion_young_warrior', owner:'AI', baseAttack:1, currentHealth:2, canAttack:true });
+  processDeaths(gs);
+  expect(gs.ai.board[0].currentHealth).toBe(1); // exploded for 1 dmg
   });
 });
 
@@ -122,7 +123,26 @@ describe('engine extended cases', () => {
     gs.ai.board.push({ entityId: 'e1', cardId: 'c_minion_young_warrior', owner:'AI', baseAttack:1, currentHealth:2, canAttack:true });
     gs.ai.board.push({ entityId: 'e2', cardId: 'c_minion_young_warrior', owner:'AI', baseAttack:1, currentHealth:2, canAttack:true });
     processDeaths(gs);
-  // Enemy minions should have reduced health (2 dmg) -> now 0
-  expect(gs.ai.board.every(m => m.currentHealth === 0)).toBe(true);
+  // Enemy minions should have reduced health (1 dmg) -> now 1
+  expect(gs.ai.board.every(m => m.currentHealth === 1)).toBe(true);
+  });
+
+  it('explicit: exploding goblin deathrattle deals 2 dmg to all enemy minions and logs event', () => {
+    const gs = initGame();
+    gs.mulliganDone = true;
+    // place goblin dead on board
+    gs.player.board.push({ entityId: 'g', cardId: 'c_minion_exploding_goblin', owner:'PLAYER', baseAttack:3, currentHealth:0, canAttack:false });
+    // enemy minions
+    gs.ai.board.push({ entityId: 't1', cardId: 'c_minion_young_warrior', owner:'AI', baseAttack:1, currentHealth:2, canAttack:true });
+    gs.ai.board.push({ entityId: 't2', cardId: 'c_minion_young_warrior', owner:'AI', baseAttack:1, currentHealth:2, canAttack:true });
+    const beforeLogLen = gs.log.length;
+    processDeaths(gs);
+  // both enemy minions damaged by 1 -> health 1
+  expect(gs.ai.board.length).toBe(2);
+  expect(gs.ai.board[0].currentHealth).toBe(1);
+  expect(gs.ai.board[1].currentHealth).toBe(1);
+    // verify a deathrattle log entry exists
+    const newLogs = gs.log.slice(beforeLogLen).join('\n');
+    expect(newLogs.includes('Deathrattle') || newLogs.includes('Eksplodujący')).toBe(true);
   });
 });

@@ -227,6 +227,38 @@ export function processDeaths(gs: GameState): GameState {
 }
 // end engine
 
+// Apply damage to a specific minion instance, consuming shield first if present.
+// Returns the actual damage applied to health (0 if shield consumed).
+// attackerEntityId is optional and is used to check for poisonous keyword on attacker minion
+export function damageMinion(gs: GameState, side: Side, entityId: string, dmg: number, source = 'effect', attackerEntityId?: string): number {
+  const ps = side === 'PLAYER' ? gs.player : gs.ai;
+  const m = ps.board.find(x => x.entityId === entityId);
+  if (!m) return 0;
+  const before = m.currentHealth;
+  if (m.shield) {
+    m.shield = false;
+    gs.log.push(`${side}: tarcza ${m.cardId} została zużyta (${source})`);
+    return 0;
+  }
+  // Poisonous handling: if an attacker entity is provided and that attacker card is poisonous,
+  // then any positive damage from it should instantly destroy the target (unless target had shield, handled above).
+  if (attackerEntityId && dmg > 0) {
+    // find attacker across both boards
+    const attacker = [...gs.player.board, ...gs.ai.board].find(x => x.entityId === attackerEntityId);
+    if (attacker) {
+      const aCard = CARDS[attacker.cardId] as MinionCard | undefined;
+      if (aCard && aCard.poisonous) {
+        // kill target immediately
+        m.currentHealth = 0;
+        gs.log.push(`${attacker.owner}: ${aCard.name} (poisonous) zabił ${m.cardId}`);
+        return Math.max(0, before - m.currentHealth);
+      }
+    }
+  }
+  m.currentHealth -= dmg;
+  return Math.max(0, before - m.currentHealth);
+}
+
 // ================= Lethal Evaluation =================
 // Returns true if the given side can produce lethal damage on opposing hero this turn (simplified model matching UI logic)
 export function computePotentialLethal(gs: GameState, side: Side): boolean {

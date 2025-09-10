@@ -54,7 +54,16 @@
 /* subtle elevated shadow while lifted */
 .hand-fan-cardLift[style*="translateY"] {
   /* softer shadow when lifted to avoid heavy contrast */
-  filter: drop-shadow(0 8px 14px rgba(0,0,0,0.36));
+  box-shadow: 0 8px 14px rgba(0,0,0,0.22);
+}
+/* Stronger lifted visual state when JS marks a card as lifted */
+.hand-fan-cardLift.lifted {
+  cursor: pointer;
+  transform-origin: 50% 90%;
+  /* ensure transform transitions still apply from inline style */
+  transition: transform 140ms cubic-bezier(.32,.72,.28,1), box-shadow 160ms ease;
+  box-shadow: 0 18px 30px rgba(0,0,0,0.28), 0 6px 12px rgba(0,0,0,0.12);
+  outline: none;
 }
 /* .hand-fan-cardLift.is-lifted removed (JS hover handles lift to avoid jump) */
 /* Fallback: jeśli z jakiegoś powodu stan hovered nie zadziała, klasyczny :hover na slocie nadal podnosi kartę minimalnie */

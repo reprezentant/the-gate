@@ -52,7 +52,7 @@ export const LogPanel: React.FC<LogPanelProps> = ({ entries }) => {
           return (
             <div key={i} className={`relative flex items-center gap-2 text-amber-300 uppercase tracking-wide font-semibold text-[11px] pt-1 ${isNew ? 'animate-log-new' : ''}`}>
               <div className="flex-1 h-px bg-gradient-to-r from-amber-400/60 via-amber-300/40 to-transparent" />
-              <span className="whitespace-nowrap drop-shadow">{l.replace(/^-+\s*/,'').replace(/\s*-+$/,'')}</span>
+              <span className="whitespace-nowrap">{l.replace(/^-+\s*/,'').replace(/\s*-+$/,'')}</span>
               <div className="flex-1 h-px bg-gradient-to-l from-amber-400/60 via-amber-300/40 to-transparent" />
             </div>
           );
@@ -61,7 +61,7 @@ export const LogPanel: React.FC<LogPanelProps> = ({ entries }) => {
         return (
           <div key={i} className={`group flex items-start gap-1.5 ${color} ${isNew ? 'animate-log-new' : ''} transition`}>            
             <span className="opacity-70 leading-5 select-none text-[11px] mt-[1px]">{icon(t)}</span>
-            <span className="flex-1 truncate group-hover:whitespace-normal group-hover:break-words pr-1 drop-shadow-sm">{l}</span>
+            <span className="flex-1 truncate group-hover:whitespace-normal group-hover:break-words pr-1">{l}</span>
           </div>
         );
       })}

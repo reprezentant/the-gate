@@ -38,7 +38,7 @@ export const Hand: React.FC<HandProps> = ({
   const centerYOffset = 100;
   const horizontalCompression = 1.38;
 
-  // Precompute x positions for proximity hover (stabilne, brak jittera bo brak rotacji zmian)
+  // Precompute x positions for proximity hover
   const xPositions = useMemo(() => {
     const arr: number[] = [];
     for (let i = 0; i < n; i++) {
@@ -50,7 +50,7 @@ export const Hand: React.FC<HandProps> = ({
     return arr;
   }, [n, startAngle, step, radius, horizontalCompression]);
 
-  // Hover state (simple per-card events, no global mouse math)
+  // Hover state
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const clearRef = useRef<number | null>(null);
   const moveRaf = useRef<number | null>(null);
@@ -62,13 +62,12 @@ export const Hand: React.FC<HandProps> = ({
   };
   const scheduleClear = () => {
     if (clearRef.current) window.clearTimeout(clearRef.current);
-  // lekkie opóźnienie – responsywność bez migania
-  clearRef.current = window.setTimeout(() => { setHoveredIndex(null); clearRef.current = null; }, 70);
+    clearRef.current = window.setTimeout(() => { setHoveredIndex(null); clearRef.current = null; }, 70);
   };
 
   const onPointerMove: React.PointerEventHandler<HTMLDivElement> = (e) => {
     if (!fanActive || xPositions.length === 0) return;
-    if (moveRaf.current) return; // throttle do ~1 frame
+    if (moveRaf.current) return; // throttle
     const wrap = wrapperRef.current;
     if (!wrap) return;
     moveRaf.current = window.requestAnimationFrame(() => {
@@ -80,22 +79,32 @@ export const Hand: React.FC<HandProps> = ({
         const d = Math.abs(relX - xPositions[i]);
         if (d < best) { best = d; closest = i; }
       }
-        // Hysteresis: avoid switching when distances are similar (prevents flicker when circling inside one card)
-        if (closest !== hoveredIndex) {
-          if (hoveredIndex === null) {
-            setHover(closest);
-          } else {
-            const prevDist = Math.abs(relX - xPositions[hoveredIndex]);
-            // require new candidate to be noticeably closer than previous (threshold in px)
-            const HYSTERESIS_PX = 18;
-            if (best + HYSTERESIS_PX < prevDist) setHover(closest);
+      if (closest !== hoveredIndex) {
+        if (hoveredIndex === null) {
+          setHover(closest);
+        } else {
+          const prevDist = Math.abs(relX - xPositions[hoveredIndex]);
+          const HYSTERESIS_PX = 28;
+          if (best + HYSTERESIS_PX < prevDist) {
+            const candidate = closest;
+            // micro-check on next RAF to avoid jitter
+            window.requestAnimationFrame(() => {
+              const rect2 = wrap.getBoundingClientRect();
+              const relX2 = e.clientX - (rect2.left + rect2.width / 2);
+              let best2 = Infinity; let closest2 = 0;
+              for (let j = 0; j < xPositions.length; j++) {
+                const d2 = Math.abs(relX2 - xPositions[j]);
+                if (d2 < best2) { best2 = d2; closest2 = j; }
+              }
+              if (closest2 === candidate) setHover(candidate);
+            });
           }
         }
+      }
     });
   };
 
   const onWrapperPointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
-    // Hit-test against slot bounding rects so clicks on overflowed parts register
     const slots = slotRefs.current;
     if (!slots || !slots.length) return;
     for (let i = 0; i < slots.length; i++) {
@@ -103,7 +112,6 @@ export const Hand: React.FC<HandProps> = ({
       if (!el) continue;
       const r = el.getBoundingClientRect();
       if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
-        // emulate pointer down behavior for that slot
         const id = i;
         const cardid = cards[id];
         const card = CARDS[cardid];
@@ -133,9 +141,16 @@ export const Hand: React.FC<HandProps> = ({
     const marked = mulliganMode && mulliganMarked?.has(i);
     const hidden = hiddenIndices?.has(i);
 
-    let style: React.CSSProperties | undefined;
+    const style: React.CSSProperties = fanActive ? {
+      transform: 'translate(-50%,0)',
+      zIndex: 100 + i,
+      transition: 'transform 300ms ease'
+    } : {
+      transform: undefined,
+      zIndex: 100 + i,
+      transition: 'transform 300ms ease'
+    };
     const liftClass = 'hand-fan-cardLift';
-    let liftTransform: string | undefined;
     if (fanActive) {
       const angle = startAngle + i * step;
       const rad = angle * Math.PI / 180;
@@ -143,47 +158,43 @@ export const Hand: React.FC<HandProps> = ({
       const y = (1 - Math.cos(rad)) * radius;
       const finalY = y - centerYOffset;
       const baseRotate = angle;
-      // SLOT: tylko podstawowa pozycja łuku (bez hover lift)
-      style = {
-        transform: `translate(-50%,0) translateX(${x.toFixed(1)}px) translateY(${finalY.toFixed(1)}px) rotate(${baseRotate.toFixed(2)}deg)`,
-        zIndex: 100 + i,
-        transition: 'transform 300ms ease'
-      };
+      style.transform = `translate(-50%,0) translateX(${x.toFixed(1)}px) translateY(${finalY.toFixed(1)}px) rotate(${baseRotate.toFixed(2)}deg)`;
+      style.zIndex = 100 + i;
       if (hoveredIndex === i) {
-  // Delicate lift: small upward raise + tiny outward push along the card's radial angle
-  // compute a subtle push in px along the radial direction so the card 'wysuwa' from the fan
-  const PUSH_PX = 4; // reduced push for subtler effect
-        const pushX = Math.sin(rad) * PUSH_PX * 0.6; // horizontal component
-        const pushY = -Math.cos(rad) * PUSH_PX * 0.35; // small vertical offset along radial
-        // combine with a mild upward translate and tiny scale for polish
-  liftTransform = `translateX(${pushX.toFixed(1)}px) translateY(${( -6 + pushY ).toFixed(1)}px) scale(1.005)`;
-        style.zIndex = 900 + i;
+        const PUSH_PX = 12;
+        const pushX = Math.sin(rad) * PUSH_PX * 0.7;
+        const pushY = -Math.cos(rad) * PUSH_PX * 0.5;
+        const liftTransform = `translateX(${pushX.toFixed(1)}px) translateY(${(-18 + pushY).toFixed(1)}px) scale(1.02)`;
+        // merge into slot style so slot remains hover target
+        style.transform = `${style.transform} ${liftTransform}`;
+        style.zIndex = 2200 + i;
       }
     }
+
+    const slotClass = fanActive ? ('hand-fan-slot' + (hoveredIndex === i ? ' lifted' : '')) : (hidden ? 'opacity-0 scale-75 pointer-events-none transition-all duration-300' : 'opacity-100 transition');
 
     return (
       <div
         key={i}
-  ref={el => { slotRefs.current[i] = el; }}
-        className={fanActive ? 'hand-fan-slot' : (hidden ? 'opacity-0 scale-75 pointer-events-none transition-all duration-300' : 'opacity-100 transition')}
+        ref={el => { slotRefs.current[i] = el; }}
+        className={slotClass}
         style={style}
         data-hand-idx={i}
+        onPointerEnter={() => { if (!hidden) setHover(i); }}
+        onPointerLeave={() => { if (!hidden) scheduleClear(); }}
       >
-  {/* Bufor – powiększa faktyczny box slotu, więc uniesiona karta nadal jest w obrębie hover */}
-  {/* usunięty bufor – hover zapewnia teraz proximity pointerMove */}
-  <div className={liftClass} style={liftTransform ? { transform: liftTransform, filter:'drop-shadow(0 8px 14px rgba(0,0,0,.36))', transition:'transform 140ms cubic-bezier(.32,.72,.28,1), filter 200ms ease' } : undefined}
-       onPointerDown={(e) => {
-         if (hidden) return;
-         // Immediate action on pointer down for snappy mulligan selection
-         if (mulliganMode) { onToggleMulligan?.(i); e.preventDefault(); return; }
-         if (!playable) return;
-         if (card.type === 'SPELL') {
-           if (pending) onToggleSpellTargeting(-1); else onToggleSpellTargeting(i);
-         } else {
-           onPlayMinion(i);
-         }
-       }}
-  >
+        <div className={liftClass}
+          onPointerDown={(e) => {
+            if (hidden) return;
+            if (mulliganMode) { onToggleMulligan?.(i); e.preventDefault(); return; }
+            if (!playable) return;
+            if (card.type === 'SPELL') {
+              if (pending) onToggleSpellTargeting(-1); else onToggleSpellTargeting(i);
+            } else {
+              onPlayMinion(i);
+            }
+          }}
+        >
           <div style={{ transform: 'scale(0.94)', transformOrigin: '50% 100%' }}>
             <CardFrame
               id={id}

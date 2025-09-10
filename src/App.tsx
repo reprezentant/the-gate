@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import type { CSSProperties, RefObject } from 'react';
 import type { GameState, MinionInstance, Side, MinionCard, SpellCard } from './game/types';
 import { CARDS } from './game/cards';
-import { initGame, playCardForSidePure, startTurnFor, heroPowerAction, BOARD_LIMIT, HAND_LIMIT, HERO_POWER_COST, HERO_POWER_DAMAGE, processDeaths, applyWinner, clone, performMulligan, onDraw, computePotentialLethal, canAttackTargetRespectingTaunt } from './game/engine';
+import { initGame, playCardForSidePure, startTurnFor, heroPowerAction, BOARD_LIMIT, HAND_LIMIT, HERO_POWER_COST, HERO_POWER_DAMAGE, processDeaths, applyWinner, clone, performMulligan, onDraw, computePotentialLethal, canAttackTargetRespectingTaunt, damageMinion } from './game/engine';
 // Removed unused legacy non-animated AI import
 import { Hero } from './components/Hero';
 import { LoaderOverlay } from './components/LoaderOverlay';
@@ -80,7 +80,7 @@ function HeroPowerFloating({ activeTurn, used, mana, cost, onUse, hidden = false
             {canUse && <circle className="pointer-events-none animate-ping" cx="50" cy="50" r="15" fill="url(#hpwr-flare)" opacity="0.28" />}
           </svg>
           <span className={`relative z-10 flex items-center justify-center h-full w-full ${canUse ? 'text-sky-100' : 'text-slate-400'} select-none`}>
-            <span className="text-3xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.6)]">⚔️</span>
+            <span className="text-3xl">⚔️</span>
           </span>
           <div className="hpwr-particles absolute inset-0 pointer-events-none overflow-visible">
             {particles.map(p => {
@@ -317,9 +317,8 @@ export default function CardGameMVP() {
       const bs = target.side === 'PLAYER' ? next.player : next.ai;
       const minion = bs.board.find(m => m.entityId === target.entityId);
       if (minion) {
-        const before = minion.currentHealth;
-        minion.currentHealth -= dmg;
-        spawnDamage(`[data-minion='${minion.entityId}']`, before - minion.currentHealth);
+        const applied = damageMinion(next, target.side, minion.entityId, dmg, card.name);
+        if (applied > 0) spawnDamage(`[data-minion='${minion.entityId}']`, applied);
         next.log.push(`YOU: czar ${card.name} (${dmg} dmg w ${CARDS[minion.cardId].name})`);
       }
     }
@@ -433,7 +432,7 @@ export default function CardGameMVP() {
         spawnDamage('[data-hero="PLAYER"]', action.dmg); await wait(400); continue;
       }
       if (action.kind==='PLAY_SPELL_MINION') {
-        setGs(prev => { const next = clone(prev); if (next.turn!=='AI') return prev; const target = next.player.board.find(m=> m.entityId===action.targetId); if (target) { const before = target.currentHealth; target.currentHealth -= action.dmg; spawnDamage(`[data-minion='${target.entityId}']`, before - Math.max(target.currentHealth,0)); next.log.push(`AI: czar ${action.dmg} dmg w ${CARDS[target.cardId].name}`); processDeaths(next); } return applyWinner(next); }); await wait(440); continue;
+  setGs(prev => { const next = clone(prev); if (next.turn!=='AI') return prev; const target = next.player.board.find(m=> m.entityId===action.targetId); if (target) { const applied = damageMinion(next, 'PLAYER', target.entityId, action.dmg, 'AI spell'); if (applied > 0) spawnDamage(`[data-minion='${target.entityId}']`, applied); next.log.push(`AI: czar ${action.dmg} dmg w ${CARDS[target.cardId].name}`); processDeaths(next); } return applyWinner(next); }); await wait(440); continue;
       }
       if (action.kind==='ATTACK_MINION') {
         const current = gsRef.current; const atk = current.ai.board.find(m=> m.entityId===action.attackerId); const def = current.player.board.find(m=> m.entityId===action.targetId); if (!atk || !def) continue; const aEl = document.querySelector(`[data-minion='${atk.entityId}']`) as HTMLElement | null; const dEl = document.querySelector(`[data-minion='${def.entityId}']`) as HTMLElement | null; if (!aEl || !dEl) continue; const a=aEl.getBoundingClientRect(), d=dEl.getBoundingClientRect();
@@ -559,24 +558,17 @@ export default function CardGameMVP() {
         const enemy = defSide === 'AI' ? next.ai : next.player;
         const def = enemy.board.find(b => b.entityId === defId);
         if (atk && def) {
-          const defBefore = def.currentHealth;
-          const atkBefore = atk.currentHealth;
-          // Divine Shield: consume shield before applying health change
-          if (def.shield) {
-            def.shield = false;
-            next.log.push(`${def.owner}: tarcza ${def.cardId} została zużyta (atak gracza)`);
-          } else {
-            def.currentHealth -= atk.baseAttack;
+          // record before values removed — we use damageMinion which returns applied amount
+          // Use central damage function to handle shield and poisonous logic
+          const appliedToDef = damageMinion(next, def.owner, def.entityId, atk.baseAttack, `atak ${CARDS[atk.cardId].name}`, atk.entityId);
+          const appliedToAtk = damageMinion(next, atk.owner, atk.entityId, (CARDS[def.cardId] as MinionCard).attack, `kontratak ${CARDS[def.cardId].name}`, def.entityId);
+          if (appliedToDef > 0) spawnDamage(`[data-minion='${def.entityId}']`, appliedToDef);
+          if (appliedToAtk > 0) spawnDamage(`[data-minion='${atk.entityId}']`, appliedToAtk);
+          const atkAlive = next.player.board.find(x => x.entityId === atk.entityId)?.currentHealth ?? 0;
+          if (atkAlive > 0) {
+            const atkInst = next.player.board.find(x => x.entityId === atk.entityId);
+            if (atkInst) atkInst.canAttack = false;
           }
-          if (atk.shield) {
-            atk.shield = false;
-            next.log.push(`${atk.owner}: tarcza ${atk.cardId} została zużyta (kontratak)`);
-          } else {
-            atk.currentHealth -= (CARDS[def.cardId] as MinionCard).attack;
-          }
-          spawnDamage(`[data-minion='${def.entityId}']`, defBefore - Math.max(def.currentHealth,0));
-          spawnDamage(`[data-minion='${atk.entityId}']`, atkBefore - Math.max(atk.currentHealth,0));
-          if (atk.currentHealth > 0) atk.canAttack = false;
           next.log.push(`YOU: atakujesz stwora ${CARDS[def.cardId].name} (${atk.baseAttack} dmg)`);
           const beforePlayerHp = next.player.heroHp, beforeAiHp = next.ai.heroHp;
           processDeaths(next);
@@ -817,9 +809,8 @@ export default function CardGameMVP() {
   {/* Player HUD (mana + deck/hand) */}
   <div className="absolute top-4 left-4 z-40 bg-black/30 backdrop-blur-sm px-3 py-2 rounded-xl border border-white/10 space-y-1 font-[Inter]">
           {/* Mana display removed (now circular) */}
-          <div className="text-[12px] mt-1 font-mono tracking-wider uppercase opacity-70">Tura: {gs.turn}</div>
-          <div className="text-[12px] font-mono opacity-80">Board {gs.player.board.length}/{BOARD_LIMIT}</div>
-          <div className="text-[12px] font-mono opacity-80">Moc: {gs.player.heroPowerUsed ? 'Użyta' : 'Gotowa'}</div>
+          <div className="text-3xl mt-1 font-sans tracking-wider opacity-95 font-extrabold">{gs.turn === 'PLAYER' ? 'Tura Gracza' : 'Tura AI'}</div>
+          {/* Board count and hero power lines removed per UX request */}
           {/* Skórki usunięte */}
         </div>
 
@@ -831,7 +822,8 @@ export default function CardGameMVP() {
               <button
                 onClick={() => { if (!undoGs) return; setGs(undoGs); setUndoGs(null); }}
                 aria-label="Cofnij"
-                className={`relative w-20 h-20 mb-2 self-center text-[11px] font-extrabold tracking-wider drop-shadow focus:outline-none transition-transform overflow-visible ${gs.turn==='PLAYER' ? 'text-white hover:scale-105 active:scale-95' : 'text-slate-400 cursor-not-allowed'} translate-y-2`}
+                style={{ marginLeft: '-12px' }}
+                className={`relative w-20 h-20 mb-2 self-center text-[11px] font-extrabold tracking-wider focus:outline-none transition-transform overflow-visible ${gs.turn==='PLAYER' ? 'text-white hover:scale-105 active:scale-95' : 'text-slate-400 cursor-not-allowed'} translate-y-2`}
               >
                 <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full -z-10 overflow-visible" style={{filter: gs.turn==='PLAYER' ? '' : 'grayscale(1) brightness(.55)'}}>
                   <defs>
@@ -900,7 +892,7 @@ export default function CardGameMVP() {
               }}
               aria-label="Koniec tury"
               disabled={gs.turn!=='PLAYER'}
-              className={`relative w-28 h-28 text-[11px] font-extrabold tracking-wider uppercase drop-shadow focus:outline-none transition-transform overflow-visible ${gs.turn==='PLAYER' ? 'text-amber-50 hover:scale-105 active:scale-95' : 'text-slate-400 cursor-not-allowed'} `}
+              className={`relative w-28 h-28 text-[11px] font-extrabold tracking-wider uppercase focus:outline-none transition-transform overflow-visible ${gs.turn==='PLAYER' ? 'text-amber-50 hover:scale-105 active:scale-95' : 'text-slate-400 cursor-not-allowed'} `}
             >
               {/* Framed decagon (orange theme) */}
               <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full -z-10 overflow-visible" style={{filter: gs.turn==='PLAYER' ? '' : 'grayscale(1) brightness(.55)'}}>
@@ -943,7 +935,7 @@ export default function CardGameMVP() {
               </svg>
               <span className="relative z-10 flex flex-col items-center justify-center h-full w-full select-none leading-tight">
                 <span className={`text-[10px] font-extrabold tracking-[0.34em] -mb-0.5 ${gs.turn==='PLAYER' ? 'text-amber-200/85' : 'text-slate-400/60'}`}>KONIEC</span>
-                <span className={`text-[19px] font-black tracking-[0.20em] drop-shadow-[0_2px_2px_rgba(0,0,0,0.65)] ${gs.turn==='PLAYER' ? 'text-amber-50' : 'text-slate-600'}`}>TURY</span>
+                <span className={`text-[19px] font-black tracking-[0.20em] ${gs.turn==='PLAYER' ? 'text-amber-50' : 'text-slate-600'}`}>TURY</span>
               </span>
               {/* Particle container */}
               <div className="endturn-particles absolute inset-0 pointer-events-none overflow-visible" />
@@ -1009,9 +1001,9 @@ export default function CardGameMVP() {
         {/* Combat / Spell prompt overlay */}
   {(attackerId || pendingSpell !== null) && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-[115]">
-            {attackerId && <div className="text-base font-semibold bg-amber-500/90 text-black px-4 py-2 rounded-full shadow-lg animate-pulse">Wybierz cel ataku</div>}
+            {attackerId && <div className="text-base font-semibold bg-amber-500/90 text-white px-4 py-2 rounded-full shadow-lg animate-pulse">Wybierz cel ataku</div>}
             {pendingSpell !== null && (
-              <div className="text-base font-semibold bg-fuchsia-500/90 text-white px-4 py-2 rounded-full shadow-lg animate-pulse tracking-wide drop-shadow">
+              <div className="text-base font-semibold bg-fuchsia-500/90 text-white px-4 py-2 rounded-full shadow-lg animate-pulse tracking-wide">
                 Wybierz cel dla: {CARDS[gs.player.hand[pendingSpell]]?.name || 'Zaklęcie'}
               </div>
             )}
@@ -1152,7 +1144,7 @@ export default function CardGameMVP() {
         {/* Damage floating numbers */}
         <div className="absolute inset-0 pointer-events-none z-50">
           {damageFx.map(fx => (
-            <div key={fx.key} className="absolute text-yellow-300 font-extrabold text-base drop-shadow-lg animate-dmg-float" style={{ left: fx.x, top: fx.y }}>
+            <div key={fx.key} className="absolute text-yellow-300 font-extrabold text-base animate-dmg-float" style={{ left: fx.x, top: fx.y }}>
               -{fx.value}
             </div>
           ))}

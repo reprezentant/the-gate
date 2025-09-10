@@ -1,0 +1,34 @@
+﻿
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Admin/Desktop/the-gate[39m
+
+ [32mÔťô[39m src/game/__tests__/poison.spec.ts[2m > [22mpoisonous[2m > [22mpoisonous minion kills damaged minion if no shield[32m 3[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/poison.spec.ts[2m > [22mpoisonous[2m > [22mpoisonous is blocked by shield (shield consumed, minion survives)[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/shield.spec.ts[2m > [22mplayed minion with shield has shield flag set[32m 3[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/lethal.spec.ts[2m > [22mcomputePotentialLethal[2m > [22mreturns true when sum of ready attacks >= enemy HP (no taunts)[32m 3[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/lethal.spec.ts[2m > [22mcomputePotentialLethal[2m > [22mreturns false when taunt soaking requires too much attack leaving insufficient face damage[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/lethal.spec.ts[2m > [22mcomputePotentialLethal[2m > [22maccounts for hero power in lethal calculation behind no taunts[32m 0[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/lethal.spec.ts[2m > [22mTaunt targeting (canAttackTargetRespectingTaunt)[2m > [22mallows attacking hero when no taunts present[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/lethal.spec.ts[2m > [22mTaunt targeting (canAttackTargetRespectingTaunt)[2m > [22mblocks attacking hero when a taunt exists[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/lethal.spec.ts[2m > [22mTaunt targeting (canAttackTargetRespectingTaunt)[2m > [22mblocks attacking non-taunt minion while taunt alive[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/lethal.spec.ts[2m > [22mTaunt targeting (canAttackTargetRespectingTaunt)[2m > [22mallows attacking the taunt minion itself[32m 0[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/lethal.spec.ts[2m > [22mTaunt targeting (canAttackTargetRespectingTaunt)[2m > [22mallows attacking hero again after taunt dies[32m 0[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/taunt.spec.ts[2m > [22mtaunt behavior[2m > [22mblocks hero targeting when taunt present[32m 3[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/taunt.spec.ts[2m > [22mtaunt behavior[2m > [22mcomputePotentialLethal accounts for taunt clearing[32m 2[2mms[22m[39m
+ [32mÔťô[39m src/__tests__/engine.test.ts[2m > [22mengine basic[2m > [22minitGame gives starting hand size and maybe cheap card guarantee (post-mulligan responsibility)[32m 2[2mms[22m[39m
+ [32mÔťô[39m src/__tests__/engine.test.ts[2m > [22mengine basic[2m > [22mmulligan replaces selected cards and preserves hand size[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/__tests__/engine.test.ts[2m > [22mengine basic[2m > [22mensureCheapCardAfterMulligan enforces at least one cost<=1 card[32m 0[2mms[22m[39m
+ [32mÔťô[39m src/__tests__/engine.test.ts[2m > [22mengine basic[2m > [22mplayCardForSidePure consumes mana and moves minion to board[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/__tests__/engine.test.ts[2m > [22mengine basic[2m > [22mhero power costs mana and flags used[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/__tests__/engine.test.ts[2m > [22mengine basic[2m > [22mdrawCards triggers fatigue damage when deck empty[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/__tests__/engine.test.ts[2m > [22mengine basic[2m > [22mstartTurnFor increases maxMana up to 10 and readies minions[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine basic[2m > [22minitGame draws starting hand size[32m 3[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine basic[2m > [22mmulligan preserves cheap guarantee[32m 2[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine basic[2m > [22mhero power deals correct damage and consumes mana[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine basic[2m > [22mplayCardForSidePure plays minion and sets justSummoned[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine basic[2m > [22mdeathrattle triggers on processDeaths (exploding goblin used)[32m 2[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine extended cases[2m > [22mfatigue damage accumulates correctly when drawing from empty deck[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine extended cases[2m > [22mboard limit prevents playing additional minion and refunds mana[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine extended cases[2m > [22mhand limit burns drawn card[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine extended cases[2m > [22mensureCheapCardAfterMulligan no-op when no cheap card exists in deck[32m 1[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine extended cases[2m > [22mdeathrattle AOE damages enemy minions (but does not chain remove in same pass)[32m 0[2mms[22m[39m
+ [32mÔťô[39m src/game/__tests__/engine.spec.ts[2m > [22mengine extended cases[2m > [22mexplicit: exploding goblin deathrattle deals 2 dmg to all enemy minions and logs event[32m 0[2mms[22m[39m

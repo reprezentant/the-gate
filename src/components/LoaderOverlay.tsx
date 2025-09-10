@@ -99,7 +99,7 @@ export const LoaderOverlay: React.FC<LoaderOverlayProps> = ({ done, progress }) 
   .tg-title-plain { position:relative; }
   .tg-title-plain:before, .tg-title-plain:after { content:none; }
   /* removed animated gradient + aura for constant subtle sheen */
-        .tg-title-inner { padding:0 .15em; filter:drop-shadow(0 6px 12px rgba(0,0,0,0.65)); position:relative; }
+        .tg-title-inner { padding:0 .15em; position:relative; }
         .tg-title-inner:after { content:none; }
   /* sheen removed */
   /* Spark system (slow drift) */

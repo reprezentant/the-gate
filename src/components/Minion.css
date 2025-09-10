@@ -45,3 +45,5 @@
 
 .minion-health-icon { position: absolute; width: 36px; height: 36px; object-fit: contain; z-index: 10 }
 .minion-health-value { position: relative; z-index: 20; font-weight:900; font-size:20px; color: white; -webkit-text-stroke:1px rgba(0,0,0,0.95); transform: translateY(-3px); }
+/* shield icon placed slightly above the HP badge */
+.minion-shield-icon { position: absolute; width: 36px; height: 36px; object-fit: contain; z-index: 40; right: 6px; bottom: 26px; transform: translateY(-2px) translateX(6px); }

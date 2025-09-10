@@ -1,5 +1,5 @@
 import { CARDS } from './cards';
-import { clone, applyWinner, playCardForSidePure, startTurnFor, heroPowerAction, HERO_POWER_COST, processDeaths } from './engine';
+import { clone, applyWinner, playCardForSidePure, startTurnFor, heroPowerAction, HERO_POWER_COST, processDeaths, damageMinion } from './engine';
 import type { GameState, MinionInstance, MinionCard, SpellCard } from './types';
 
 // AI logic extracted from App.tsx for separation of concerns.
@@ -96,10 +96,8 @@ export function simulateAiTurnOnce(gs: GameState): GameState {
   const favorable = attackPool.find(pm => pm.currentHealth <= m.baseAttack && (CARDS[pm.cardId] as MinionCard).attack < m.currentHealth);
     if (favorable) {
       // Shield handling in simulation
-      if (favorable.shield) { favorable.shield = false; next.log.push(`${favorable.owner}: tarcza ${favorable.cardId} (symulacja)`); }
-      else { favorable.currentHealth -= m.baseAttack; }
-      if (m.shield) { m.shield = false; next.log.push(`${m.owner}: tarcza ${m.cardId} (symulacja)`); }
-      else { m.currentHealth -= (CARDS[favorable.cardId] as MinionCard).attack; }
+  damageMinion(next, 'PLAYER', favorable.entityId, m.baseAttack, 'AI attack (sim)', m.entityId);
+  damageMinion(next, 'AI', m.entityId, (CARDS[favorable.cardId] as MinionCard).attack, 'counterattack (sim)', favorable.entityId);
       next.log.push(`AI: trade z ${CARDS[favorable.cardId].name}`);
       if (favorable.currentHealth <= 0) next.player.board = next.player.board.filter(x => x.entityId !== favorable.entityId);
       processDeaths(next);
@@ -108,10 +106,8 @@ export function simulateAiTurnOnce(gs: GameState): GameState {
     }
   const anyKill = attackPool.find(pm => pm.currentHealth <= m.baseAttack);
     if (anyKill) {
-      if (anyKill.shield) { anyKill.shield = false; next.log.push(`${anyKill.owner}: tarcza ${anyKill.cardId} (symulacja)`); }
-      else { anyKill.currentHealth -= m.baseAttack; }
-      if (m.shield) { m.shield = false; next.log.push(`${m.owner}: tarcza ${m.cardId} (symulacja)`); }
-      else { m.currentHealth -= (CARDS[anyKill.cardId] as MinionCard).attack; }
+  damageMinion(next, 'PLAYER', anyKill.entityId, m.baseAttack, 'AI attack (sim)', m.entityId);
+  damageMinion(next, 'AI', m.entityId, (CARDS[anyKill.cardId] as MinionCard).attack, 'counterattack (sim)', anyKill.entityId);
       next.log.push(`AI: poświęca się na ${CARDS[anyKill.cardId].name}`);
       if (anyKill.currentHealth <= 0) next.player.board = next.player.board.filter(x => x.entityId !== anyKill.entityId);
       processDeaths(next);

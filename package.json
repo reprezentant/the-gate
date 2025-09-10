@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+  "dev": "cross-env VITE_HOST=127.0.0.1 VITE_PORT=5173 vite",
+  "clean:win": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/clean.ps1",
+  "clean:unix": "sh ./scripts/clean.sh",
+  "clean": "node -e \"const os=require('os'); if(os.platform()==='win32') console.log('Running clean:win'); process.exit(0);\" && npm run clean:win",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -33,6 +36,8 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2",
-    "vitest": "^3.2.4"
+  "vitest": "^3.2.4",
+  "cross-env": "^7.0.3"
   }
 }
+
