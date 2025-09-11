@@ -660,7 +660,7 @@ export default function CardGameMVP() {
     } : {};
 
     return (
-      <div className="min-h-screen flex items-center justify-center relative" style={endBgStyle}>
+      <div className="min-h-full flex items-center justify-center relative" style={endBgStyle}>
         {/* dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/55" />
         <div className="relative w-[min(1100px,94vw)] p-8 rounded-[2.75rem] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.75)] border border-white/10 bg-gradient-to-br from-white/6 via-transparent to-white/3 backdrop-blur-md text-center text-white">
@@ -768,7 +768,7 @@ export default function CardGameMVP() {
   };
 
   return (
-    <div className="arena-scale-wrapper" onMouseMove={(e)=> setPointer({x:e.clientX,y:e.clientY})}>
+  <div className="arena-scale-wrapper w-screen h-screen" onMouseMove={(e)=> setPointer({x:e.clientX,y:e.clientY})}>
       <LoaderOverlay done={bootDone} progress={bootProgress} />
       <div style={arenaScaleStyle} className="arena-scale-inner">
   <div ref={arenaRef} className="relative w-full aspect-[16/9] rounded-[2.75rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.6)] overflow-visible border border-white/15 backdrop-blur-sm bg-white/2 before:content-[''] before:absolute before:inset-0 before:rounded-[2.75rem] before:pointer-events-none before:border before:border-white/5 before:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06),0_0_0_1px_rgba(255,255,255,0.04)] after:content-[''] after:absolute after:inset-0 after:rounded-[2.75rem] after:pointer-events-none after:bg-gradient-to-br after:from-white/6 after:via-transparent after:to-white/2">

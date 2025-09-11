@@ -1,27 +1,16 @@
-import fs from 'fs';
-import path from 'path';
+// Minimal telemetry utilities for offline simulations.
+export type TelemetryEvent = { type: string; payload?: Record<string, unknown> };
 
-export type Telemetry = { games: number; playerWins: number; aiWins: number; draws: number; avgTurns: number; poisonTriggers: number; deathrattleTriggers: number };
+const events: TelemetryEvent[] = [];
 
-export function createCollector() {
-  const state = { games: 0, playerWins: 0, aiWins: 0, draws: 0, avgTurns: 0, poisonTriggers: 0, deathrattleTriggers: 0 } as Telemetry;
-  return {
-    record(res: any) {
-      state.games += 1;
-      if (res.winner === 'PLAYER') state.playerWins++; else if (res.winner === 'AI') state.aiWins++; else if (res.winner === 'DRAW') state.draws++;
-      state.avgTurns += res.turns;
-      state.poisonTriggers += res.poisonTriggers || 0;
-      state.deathrattleTriggers += res.deathrattleTriggers || 0;
-    },
-    finalize() {
-      if (state.games) state.avgTurns = state.avgTurns / state.games;
-      return state;
-    },
-    saveTo(fileName: string) {
-      const out = this.finalize();
-      const outPath = path.resolve(process.cwd(), fileName);
-      fs.writeFileSync(outPath, JSON.stringify(out, null, 2), 'utf8');
-      return outPath;
-    }
-  };
+export function record(e: TelemetryEvent) {
+	events.push(e);
 }
+
+export function drain(): TelemetryEvent[] {
+	const copy = events.slice();
+	events.length = 0;
+	return copy;
+}
+
+export default { record, drain };

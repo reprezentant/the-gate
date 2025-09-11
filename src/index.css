@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fill the available browser viewport (keep browser chrome visible). Use dynamic viewport units with fallbacks.
+   svh/svw address modern browser UI chrome; fall back to 100vh/100vw for broader support. Also ensure no body margin. */
 html, body, #root {
-  height: 100%;
+  height: 100svh; /* primary: dynamic small viewport height */
+  min-height: 100vh; /* fallback */
+  width: 100svw; /* primary dynamic width */
+  min-width: 100vw; /* fallback */
+  margin: 0;
 }
 
 /* Fluid typography scale: between mobile and large desktop */
@@ -63,7 +69,17 @@ body {
 .scroll-hidden { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Arena scaling wrapper classes */
-.arena-scale-wrapper { position: relative; width: 100%; height: 100%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.arena-scale-wrapper {
+  position: relative;
+  width: 100svw; /* fill viewport width */
+  min-width: 100%;
+  height: 100svh; /* fill viewport height */
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 .arena-scale-inner { transform-origin: top center; }
 
 .card-surface { @apply bg-slate-800 rounded-xl border border-white/10 shadow-lg; }
