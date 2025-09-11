@@ -4,12 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-  "dev": "cross-env VITE_HOST=127.0.0.1 VITE_PORT=5173 vite",
-  "clean:win": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/clean.ps1",
-  "clean:unix": "sh ./scripts/clean.sh",
-  "clean": "node -e \"const os=require('os'); if(os.platform()==='win32') console.log('Running clean:win'); process.exit(0);\" && npm run clean:win",
+    "dev": "cross-env VITE_HOST=127.0.0.1 VITE_PORT=5173 vite",
+    "clean:win": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/clean.ps1",
+    "clean:unix": "sh ./scripts/clean.sh",
+    "clean": "node -e \"const os=require('os'); if(os.platform()==='win32') console.log('Running clean:win'); process.exit(0);\" && npm run clean:win",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "sim:build": "esbuild --bundle scripts/sim/simulate.ts --outfile=dist/sim.cjs --platform=node --target=node18 --format=cjs",
+    "sim:run": "npm run sim:build && node dist/sim.cjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -22,22 +24,23 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
-    "@types/node": "^22.7.5",
+    "@types/node": "^22.18.1",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.25.9",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.14",
+    "ts-node": "^10.9.2",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2",
-  "vitest": "^3.2.4",
-  "cross-env": "^7.0.3"
+    "vitest": "^3.2.4"
   }
 }
-

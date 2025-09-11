@@ -156,6 +156,31 @@ Prototyp edukacyjny – nazwa robocza "The Gate" – brak formalnej licencji (do
 
 # React + TypeScript + Vite
 
+## Simulation runner (CLI)
+
+There is a small simulation runner useful for deterministic AI-vs-AI runs and producing replay JSON files. It is located at `scripts/sim/simulate.ts` and is wired into npm scripts.
+
+Usage examples (PowerShell):
+
+```
+npm run sim:run -- 12345                      # run with seed 12345, default snapshots=full
+npm run sim:run -- --out replay.json 12345    # write to custom path
+npm run sim:run -- --maxTurns 50 12345        # limit to 50 turns
+npm run sim:run -- --snapshots compact 12345  # write compact per-half-turn snapshots
+```
+
+Flags:
+- `--out <path>` or `-o` — output file path (relative to cwd). If omitted, uses `dist/scripts/sim/replay-<seed>.json`.
+- `--maxTurns <n>` — maximum number of full turns to simulate (default 100).
+- `--snapshots <full|compact|none>` — snapshot capture mode:
+  - `full` — deep clone of full GameState after each half-turn (default).
+  - `compact` — minimal per-half-turn summary (hero HP, boards, last log lines).
+  - `none` — do not capture snapshots.
+- `--verbose` — print chosen seed, maxTurns and out path.
+
+The runner is bundled with `esbuild` before execution (npm script `sim:run`). Replays are deterministic when you pass a seed and the engine's RNG is preserved in the output JSON.
+
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
