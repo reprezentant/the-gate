@@ -73,3 +73,9 @@ Thank you for contributing!
 Recent local edits
 -----------------
 - UI and naming updates were made locally: AI now has separate names and image assets; played-card artwork and layout were adjusted; avatars changed to a decagon shape; small HUD/label position tweaks applied. Please include screenshots when opening PRs that touch these visual areas.
+
+Safety / clean scripts
+----------------------
+- `scripts/clean.ps1` and `scripts/clean.sh` have been hardened to require explicit environment flags (e.g. `ALLOW_CLEAN=1` and `CLEAN_CONFIRM=1`) before performing destructive actions like removing `node_modules` or killing processes. By default they are no-ops for safety.
+- Start the dev server only from the project root (`the-gate/`) to avoid accidentally running cleaners in a parent workspace.
+

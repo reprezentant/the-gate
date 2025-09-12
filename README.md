@@ -65,6 +65,12 @@ Please see `RULES.md` for small repository rules and contribution guidelines (br
 - Played-card artwork scaled and positioned for better readability; AI minions slightly nudged down.
 - Avatars changed to decagon (10-sided) shape; hero labels and meter labels adjusted and widened to avoid clipping.
 
+## Recent local edits (additional)
+
+- Removed legacy `ribborn.svg` / `ribbon.svg` assets that caused import errors and simplified CardFrame asset usage.
+- Increased hand card size for improved readability (hand cards now render larger widths/heights).
+- Spell cards (when shown in hand) use `spell_bg.svg` background; minions keep `card-bg.svg`.
+
 ## Architektura w skrócie
 Warstwa logiki gry pozostaje czysta (bez zależności od DOM) – reakcje UI są tylko efektem danych. Najważniejsze komponenty:
 

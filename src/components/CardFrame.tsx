@@ -9,6 +9,8 @@ import deathUrl from '../assets/icons/death.svg';
 import poisonUrl from '../assets/icons/poison.svg';
 import rushUrl from '../assets/icons/rush.svg';
 import manaUrl from '../assets/icons/mana.svg';
+import cardBgUrl from '../assets/cards/card-bg.svg';
+import spellBgUrl from '../assets/cards/spell_bg.svg';
 import { getCardImage } from '../game/cardImages';
 import { getDisplayName } from '../game/cards';
 
@@ -47,6 +49,18 @@ export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, mar
   const interactive = playable || selectable;
   const hoverClass = mulliganMode ? (selectable ? 'cursor-pointer' : 'cursor-default opacity-70 grayscale brightness-75 saturate-50') : (interactive ? 'cursor-pointer hover:brightness-105 active:brightness-95' : 'cursor-default opacity-70 grayscale brightness-75 saturate-50');
   const mulliganSelected = !!marked && !!mulliganMode; // stronger explicit flag
+
+  // Use svg background for cards shown in hand (handIndex defined)
+  const useSvgBg = handIndex !== undefined;
+  const sizeClass = useSvgBg ? 'w-[8.5rem] h-52' : 'w-[6.8rem] h-44';
+  const bgClass = useSvgBg ? '' : (c.type === 'MINION' ? 'bg-gradient-to-b from-emerald-700 to-emerald-600 border-emerald-300/70' : 'bg-gradient-to-b from-purple-800 to-purple-700 border-purple-300/70');
+  const bgStyle: React.CSSProperties | undefined = useSvgBg ? {
+    backgroundImage: `url(${c.type === 'SPELL' ? spellBgUrl : cardBgUrl})`,
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center'
+  } : undefined;
+
   return (
     <motion.div
       // Zastąpiono animacje whileHover / whileTap stabilnymi klasami CSS, aby uniknąć "skakania" przy szybkim najeżdżaniu
@@ -55,10 +69,11 @@ export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, mar
       initial={false}
   aria-pressed={mulliganSelected || undefined}
   data-mulligan-sel={mulliganSelected ? '1' : undefined}
-  className={`relative w-[8.6rem] h-44 rounded-xl p-2 flex flex-col font-sans border-[1.5px] transition select-none text-white
+  className={`relative ${sizeClass} rounded-xl p-2 flex flex-col font-sans border-[1.5px] transition select-none text-white overflow-visible
   ${hoverClass}
   duration-120 ease-out
-  ${c.type === 'MINION' ? 'bg-gradient-to-b from-emerald-700 to-emerald-600 border-emerald-300/70' : 'bg-gradient-to-b from-purple-800 to-purple-700 border-purple-300/70'} shadow-sm`}
+  ${bgClass} shadow-sm`}
+  style={bgStyle}
   data-hand-idx={handIndex}
     >
   <div className="relative z-20 flex justify-between items-start text-[14px] font-semibold">
@@ -72,7 +87,9 @@ export const CardFrame: React.FC<CardFrameProps> = ({ id, playable, pending, mar
   return <div className="w-full h-24 rounded-md bg-gradient-to-b from-white/90 to-white/70 flex items-center justify-center text-sm font-semibold text-gray-600">ART</div>;
     })()}
   </div>
-  <div className="text-[18px] font-extrabold text-center leading-tight px-1 tracking-wide mt-12" style={{ textShadow: 'none' }}>{displayName}</div>
+  <div className="relative w-full flex justify-center items-center" style={{ marginTop: 'calc(3.5rem + 8px)', overflow: 'visible' }}>
+    <div className="relative z-50 pointer-events-none text-[18px] font-extrabold text-center leading-tight px-1 tracking-wide" style={{ textShadow: 'none' }}>{displayName}</div>
+  </div>
   {c.text && (
   <div className="mt-2 text-[13px] text-white/90 leading-snug px-1 font-medium line-clamp-3 min-h-[2.5rem] text-center">
   <div style={{ textShadow: 'none' }}>{c.text}</div>
