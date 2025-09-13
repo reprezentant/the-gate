@@ -64,13 +64,13 @@ Please see `RULES.md` for small repository rules and contribution guidelines (br
 - AI now uses separate names and separate `src/assets/cards/ai` images (player uses `human`).
 - Played-card artwork scaled and positioned for better readability; AI minions slightly nudged down.
 - Avatars changed to decagon (10-sided) shape; hero labels and meter labels adjusted and widened to avoid clipping.
-
-## Recent local edits (additional)
-
+- Divider line between played cards (player vs AI) can be nudged up/down for layout tuning.
+- Increased hand card size for improved readability; hand cards now render larger widths/heights.
+- Spell cards in hand use `spell_bg.svg` background; minions use `card-bg.svg`.
+- Status icons (shield, poison, rush, deathrattle) are stacked in a right column under ATK, with fine-tuned position.
+- HUD cluster (avatar, mana, hp, deck, hand) can be moved up/down for spacing; hand can be nudged independently.
 - Removed legacy `ribborn.svg` / `ribbon.svg` assets that caused import errors and simplified CardFrame asset usage.
-- Increased hand card size for improved readability (hand cards now render larger widths/heights).
-- Spell cards (when shown in hand) use `spell_bg.svg` background; minions keep `card-bg.svg`.
-
+- Safety: `scripts/clean.ps1` and `scripts/clean.sh` require explicit env flags to run destructive actions.
 ## Architektura w skrócie
 Warstwa logiki gry pozostaje czysta (bez zależności od DOM) – reakcje UI są tylko efektem danych. Najważniejsze komponenty:
 

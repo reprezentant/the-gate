@@ -70,9 +70,19 @@ Small, practical guidance
 
 Thank you for contributing!
 
+
 Recent local edits
 -----------------
-- UI and naming updates were made locally: AI now has separate names and image assets; played-card artwork and layout were adjusted; avatars changed to a decagon shape; small HUD/label position tweaks applied. Please include screenshots when opening PRs that touch these visual areas.
+- AI now uses separate names and image assets (`src/assets/cards/ai`); player uses `human` assets.
+- Played-card artwork scaled and positioned for better readability; AI minions slightly nudged down.
+- Avatars changed to decagon (10-sided) shape; hero labels and meter labels adjusted and widened to avoid clipping.
+- Divider line between played cards (player vs AI) can be nudged up/down for layout tuning.
+- Increased hand card size for improved readability; hand cards now render larger widths/heights.
+- Spell cards in hand use `spell_bg.svg` background; minions use `card-bg.svg`.
+- Status icons (shield, poison, rush, deathrattle) are stacked in a right column under ATK, with fine-tuned position.
+- HUD cluster (avatar, mana, hp, deck, hand) can be moved up/down for spacing; hand can be nudged independently.
+- Removed legacy `ribborn.svg` / `ribbon.svg` assets that caused import errors and simplified CardFrame asset usage.
+- Safety: `scripts/clean.ps1` and `scripts/clean.sh` require explicit env flags to run destructive actions.
 
 Safety / clean scripts
 ----------------------
